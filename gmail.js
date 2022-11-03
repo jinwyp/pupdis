@@ -33,10 +33,11 @@ const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // time.
 const DISNEYCODE_PATH = path.join(process.cwd(), 'disneycode.html');
 const DISNEYCODE_PATH2 = path.join('/www/wwwroot/disney1tk/public/download/disneycode.html');
-const TOKEN_PATH = path.join(process.cwd(), 'gmail_token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), './config_gmail/credentials.json');
+const TOKEN_PATH = path.join(process.cwd(), './config_gmail/gmail_token.json');
+const CREDENTIALS_PATH = path.join(process.cwd(), './config_gmail/sk_credentials.json');
 
-
+console.log("TOKEN_PATH: ", TOKEN_PATH)
+console.log("CREDENTIALS_PATH: ", CREDENTIALS_PATH)
 
 
 /**
