@@ -197,9 +197,10 @@ async function listMessages(auth) {
             const html = `<html lang="en-US"> <body> ${intro} <p style=" font-size: 24px;"> ${finalCode[0]}</p>     </body> </html>`
             const content = await fs.writeFile(DISNEYCODE_PATH, html);
 
-            if (fss.existsSync()) {
+            if (fss.existsSync("/www/wwwroot/disney1tk/public/download")) {
                 const contentCopy = await fs.copyFile(DISNEYCODE_PATH, DISNEYCODE_PATH2);
-                const contentCopy2 = await fs.chown(DISNEYCODE_PATH, 1000, 1000);
+                const contentCopy2 = await fs.chown(DISNEYCODE_PATH2, 1000, 1000);
+                console.log("fs.copyFile: ", contentCopy);
             }
             console.log("fs.writeFile: ", content);
 
