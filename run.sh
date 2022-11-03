@@ -15,9 +15,12 @@ while [ $i -lt 12 ]; do
 done
 
 
-* * * * *  node /root/disneyp/pupdis/gmail.js
-* * * * * sleep 10; node /root/disneyp/pupdis/gmail.js
-* * * * * sleep 20; node /root/disneyp/pupdis/gmail.js
-* * * * * sleep 30; node /root/disneyp/pupdis/gmail.js
-* * * * * sleep 40; node /root/disneyp/pupdis/gmail.js
-* * * * * sleep 50; node /root/disneyp/pupdis/gmail.js
+
+# https://unix.stackexchange.com/questions/163352/what-does-dev-null-21-mean-in-this-article-of-crontab-basics
+
+* * * * * cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
+* * * * * sleep 10; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
+* * * * * sleep 20; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
+* * * * * sleep 30; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
+* * * * * sleep 40; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
+* * * * * sleep 50; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1

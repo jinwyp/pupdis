@@ -32,10 +32,12 @@ const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // created automatically when the authorization flow completes for the first
 // time.
 const DISNEYCODE_PATH = path.join(process.cwd(), './disneycode.html');
-const DISNEYCODE_PATH2 = path.join('/www/wwwroot/disney1tk/public/download/disneycode.html');
+const DISNEYCODE_WWWSITEPATH = "/www/wwwroot/disney1tk/public/download";
+const DISNEYCODE_WWWSITEHTMLPATH = path.join('/www/wwwroot/disney1tk/public/download/disneycode.html');
 const TOKEN_PATH = path.join(process.cwd(), './config_gmail/gmail_token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), './config_gmail/sk_credentials.json');
 
+console.log('==========++++++++++==========')
 console.log("TOKEN_PATH: ", TOKEN_PATH)
 console.log("CREDENTIALS_PATH: ", CREDENTIALS_PATH)
 
@@ -51,7 +53,7 @@ async function loadSavedCredentialsIfExist() {
         const credentials = JSON.parse(content);
         return google.auth.fromJSON(credentials);
     } catch (err) {
-        console.log("google.auth.fromJSON:")
+        console.log("google.auth.fromJSON error:")
         console.log(err)
         return null;
     }
@@ -67,7 +69,7 @@ async function loadSavedCredentialsIfExist() {
  */
 async function saveCredentials(client) {
     const content = await fs.readFile(CREDENTIALS_PATH);
-    console.log("CREDENTIALS_PATH:", content)
+    console.log("SAVE CREDENTIALS_PATH:", content)
     const keys = JSON.parse(content);
     const key = keys.installed || keys.web;
     const payload = JSON.stringify({
@@ -90,7 +92,7 @@ async function saveCredentials(client) {
 async function authorize() {
     let client = await loadSavedCredentialsIfExist();
     if (client) {
-        console.log(client)
+        // console.log(client)
         return client;
     }
     client = await authenticate({
@@ -151,22 +153,18 @@ async function listMessages(auth) {
 
     });
 
-    // console.log(res.data.messages)
-    console.log('==========++++++++++==========')
-
     const messages = res.data.messages;
 
     if (!messages || messages.length === 0) {
-        console.log('No messages found.');
+        console.log('No Gmail messages found.');
         return;
     }
-
 
     const matchRegExpCode = /(?<=\s)\d{6}/;
 
     messages.forEach(async(message) => {
-        console.log('==========++++++++++==========')
-        console.log(`-- ${message.id} | ${message.threadId}`);
+        console.log("")
+        console.log(`===== Gmail message:  ${message.id} | ${message.threadId}`);
         const messageInfo = await gmail.users.messages.get({
             // The format to return the message in.
             format: 'full',
@@ -181,34 +179,38 @@ async function listMessages(auth) {
             userId: 'me',
 
         });
-        console.log("")
-            // console.log(messageInfo.data.payload.body.data);
 
-        const bodyData = messageInfo.data.payload.body.data;
-        const bodyInfo = Buffer.from(bodyData, 'base64').toString('utf-8');
+        // console.log(messageInfo.data.payload.body.data);
+
+        const bodyInfo = Buffer.from(messageInfo.data.payload.body.data, 'base64').toString('utf-8');
         let finalCode = matchRegExpCode.exec(bodyInfo);
 
         // console.log(bodyInfo);
 
         if (finalCode) {
-            console.log('==========++++++++++==========')
+            console.log("")
+            console.log('Disney one time auth code: ');
+            console.log("")
             console.log(finalCode[0]);
+            console.log("")
             const intro = ` <p style="color:red; font-size: 16px;"> <br/> 6位数字验证码如下(刷新页面保证获取到最新的验证码 系统每15秒更新一次): <br/><br/> 输入6位数字验证码成功后有时会提示修改密码(网页显示的提示信息为: Create a new password ) 请务必不要修改密码, 否则一律封号. 请谨慎操作! <br/><br/> 输入6位数字验证码成功后 直接重新打开 https://www.disneyplus.com/zh-hans/home 即可 </p>`
             const html = `<html lang="zh-CN">  <head> <meta charset="utf-8"> </head> <body> ${intro} <p style=" font-size: 24px;"> ${finalCode[0]}</p>     </body> </html>`
             const content = await fs.writeFile(DISNEYCODE_PATH, html);
 
-            if (fss.existsSync("/www/wwwroot/disney1tk/public/download")) {
-                const contentCopy = await fs.copyFile(DISNEYCODE_PATH, DISNEYCODE_PATH2);
-                const contentCopy2 = await fs.chown(DISNEYCODE_PATH2, 1000, 1000);
-                console.log("fs.copyFile: ", contentCopy);
+            if (fss.existsSync(DISNEYCODE_WWWSITEPATH)) {
+                const contentCopy = await fs.copyFile(DISNEYCODE_PATH, DISNEYCODE_WWWSITEHTMLPATH);
+                const contentCopy2 = await fs.chown(DISNEYCODE_WWWSITEHTMLPATH, 1000, 1000);
+                // console.log("fs.copyFile: ", contentCopy);
             }
-            console.log("fs.writeFile: ", content);
+            // console.log("fs.writeFile: ", content);
 
         } else {
-            console.log("No disney code found");
+            console.log("Disney one time auth code not found !");
         }
 
+        console.log('==========++++++++++==========')
     });
+
 
 }
 
