@@ -31,7 +31,7 @@ const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const DISNEYCODE_PATH = path.join(process.cwd(), 'disneycode.html');
+const DISNEYCODE_PATH = path.join(process.cwd(), './disneycode.html');
 const DISNEYCODE_PATH2 = path.join('/www/wwwroot/disney1tk/public/download/disneycode.html');
 const TOKEN_PATH = path.join(process.cwd(), './config_gmail/gmail_token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), './config_gmail/sk_credentials.json');
