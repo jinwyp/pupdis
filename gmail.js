@@ -194,7 +194,7 @@ async function listMessages(auth) {
             console.log('==========++++++++++==========')
             console.log(finalCode[0]);
             const intro = ` <p style="color:red; font-size: 16px;"> <br/> 6位数字验证码如下(刷新页面保证获取到最新的验证码): <br/><br/> 输入6位数字验证码成功后有时会提示修改密码(网页显示的提示信息为: Create a new password ) 请务必不要修改密码, 否则一律封号. 请谨慎操作! <br/><br/> 输入6位数字验证码成功后 直接重新打开 https://www.disneyplus.com/zh-hans/home 即可 </p>`
-            const html = `<html lang="en-US"> <body> ${intro} <p style=" font-size: 24px;"> ${finalCode[0]}</p>     </body> </html>`
+            const html = `<html lang="zh-CN"> <body> ${intro} <p style=" font-size: 24px;"> ${finalCode[0]}</p>     </body> </html>`
             const content = await fs.writeFile(DISNEYCODE_PATH, html);
 
             if (fss.existsSync("/www/wwwroot/disney1tk/public/download")) {
