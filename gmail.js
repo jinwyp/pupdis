@@ -50,6 +50,8 @@ async function loadSavedCredentialsIfExist() {
         const credentials = JSON.parse(content);
         return google.auth.fromJSON(credentials);
     } catch (err) {
+        console.log("google.auth.fromJSON:")
+        console.log(err)
         return null;
     }
 }
@@ -64,6 +66,7 @@ async function loadSavedCredentialsIfExist() {
  */
 async function saveCredentials(client) {
     const content = await fs.readFile(CREDENTIALS_PATH);
+    console.log("CREDENTIALS_PATH:", content)
     const keys = JSON.parse(content);
     const key = keys.installed || keys.web;
     const payload = JSON.stringify({
@@ -86,6 +89,7 @@ async function saveCredentials(client) {
 async function authorize() {
     let client = await loadSavedCredentialsIfExist();
     if (client) {
+        console.log(client)
         return client;
     }
     client = await authenticate({
