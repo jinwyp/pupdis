@@ -16,12 +16,16 @@
 /* eslint-disable camelcase */
 // [START gmail_quickstart]
 
-const fss = require('fs');
-const fs = require('fs').promises;
+const fs = require('fs');
+const fsp = require('fs').promises;
 const path = require('path');
 const process = require('process');
+
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
+
+
+const config = require('./config_gmail/config.js');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
@@ -31,16 +35,10 @@ const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const DISNEYCODE_PATH = path.join(process.cwd(), './disneycode.html');
-const DISNEYCODE_WWWSITEPATH = "/www/wwwroot/disney1tk/public/download";
-const DISNEYCODE_WWWSITEHTMLPATH = path.join('/www/wwwroot/disney1tk/public/download/disneycode.html');
-const TOKEN_PATH = path.join(process.cwd(), './config_gmail/gmail_token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), './config_gmail/sk_credentials.json');
 
+
+console.log();
 console.log('==========++++++++++==========')
-console.log("TOKEN_PATH: ", TOKEN_PATH)
-console.log("CREDENTIALS_PATH: ", CREDENTIALS_PATH)
-
 
 /**
  * Reads previously authorized credentials from the save file.
@@ -49,16 +47,16 @@ console.log("CREDENTIALS_PATH: ", CREDENTIALS_PATH)
  */
 async function loadSavedCredentialsIfExist() {
     try {
-        const content = await fs.readFile(TOKEN_PATH);
+        const content = await fsp.readFile(config.TOKEN_PATH);
         const credentials = JSON.parse(content);
         return google.auth.fromJSON(credentials);
     } catch (err) {
-        console.log("google.auth.fromJSON error:")
+        console.log('\n');
+        console.log("=== Gmail Token from JSON File error: ")
         console.log(err)
         return null;
     }
 }
-
 
 
 /**
@@ -68,21 +66,24 @@ async function loadSavedCredentialsIfExist() {
  * @return {Promise<void>}
  */
 async function saveCredentials(client) {
-    const content = await fs.readFile(CREDENTIALS_PATH);
-    console.log("SAVE CREDENTIALS_PATH:", content)
+    const content = await fsp.readFile(config.CREDENTIALS_PATH);
+    // console.log('\n');
+    // console.log("=== SAVE CREDENTIALS Content:", content)
+
     const keys = JSON.parse(content);
     const key = keys.installed || keys.web;
-    const payload = JSON.stringify({
+    const payloadTemp = JSON.stringify({
         type: 'authorized_user',
         client_id: key.client_id,
         client_secret: key.client_secret,
+        access_token: client.credentials.access_token,
         refresh_token: client.credentials.refresh_token,
+        token_type: client.credentials.token_type,
+        scope: client.credentials.scope,
+        expiry_date: client.credentials.expiry_date,
     });
-    await fs.writeFile(TOKEN_PATH, payload);
+    await fsp.writeFile(config.TOKEN_PATH, payloadTemp);
 }
-
-
-
 
 
 /**
@@ -97,13 +98,23 @@ async function authorize() {
     }
     client = await authenticate({
         scopes: SCOPES,
-        keyfilePath: CREDENTIALS_PATH,
+        keyfilePath: config.CREDENTIALS_PATH,
     });
+    console.log('\n');
+    // console.log("=== Gmail Auth CREDENTIALS Content: ")
+    // console.log(client)
+
     if (client.credentials) {
         await saveCredentials(client);
     }
     return client;
 }
+
+
+
+
+
+
 
 
 
@@ -132,21 +143,32 @@ async function listLabels(auth) {
 async function listMessages(auth) {
     const gmail = google.gmail({ version: 'v1', auth });
 
+
+    let searchQuery = '';
+
+    if (config.searchGmail.fromText) {
+        searchQuery = `from:${config.searchGmail.fromText}`;
+    }
+
+    if (config.searchGmail.subject) {
+        searchQuery = searchQuery + `subject:${config.searchGmail.subject}`;
+    }
+
     const res = await gmail.users.messages.list({
         // Include messages from `SPAM` and `TRASH` in the results.
         includeSpamTrash: true,
 
         // Only return messages with labels that match all of the specified label IDs.
-        labelIds: ['INBOX', 'UNREAD'],
+        labelIds: config.searchGmail.labelIds,
 
         // Maximum number of messages to return. This field defaults to 100. The maximum allowed value for this field is 500.
-        maxResults: '1',
+        maxResults: config.searchGmail.maxResults,
 
         // Page token to retrieve a specific page of results in the list.
         pageToken: '',
 
         // Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be used when accessing the api using the gmail.metadata scope.
-        q: 'from:Disney+ subject:您的一次性密码 ',
+        q: searchQuery,
 
         // The user's email address. The special value `me` can be used to indicate the authenticated user.
         userId: 'me',
@@ -156,6 +178,7 @@ async function listMessages(auth) {
     const messages = res.data.messages;
 
     if (!messages || messages.length === 0) {
+        console.log('\n');
         console.log('No Gmail messages found.');
         return;
     }
@@ -163,8 +186,8 @@ async function listMessages(auth) {
     const matchRegExpCode = /(?<=\s)\d{6}/;
 
     messages.forEach(async(message) => {
-        console.log("")
-        console.log(`===== Gmail message:  ${message.id} | ${message.threadId}`);
+
+        console.log(`=== Gmail message id :  ${message.id} | ${message.threadId}`);
         const messageInfo = await gmail.users.messages.get({
             // The format to return the message in.
             format: 'full',
@@ -180,9 +203,15 @@ async function listMessages(auth) {
 
         });
 
-        // console.log(messageInfo.data.payload.body.data);
+        // console.log(messageInfo.data.payload.body);
+        let bodyData = messageInfo.data.payload.body.data;
 
-        const bodyInfo = Buffer.from(messageInfo.data.payload.body.data, 'base64').toString('utf-8');
+        if (messageInfo.data.payload.body.size === 0) {
+            bodyData = messageInfo.data.payload.parts[0].body.data;
+        }
+
+
+        const bodyInfo = Buffer.from(bodyData, 'base64').toString('utf-8');
         let finalCode = matchRegExpCode.exec(bodyInfo);
 
         // console.log(bodyInfo);
@@ -193,22 +222,23 @@ async function listMessages(auth) {
             console.log("")
             console.log(finalCode[0]);
             console.log("")
-            const intro = ` <p style="color:red; font-size: 16px;"> <br/> Disney+ 一次性密码 6位数字验证码如下 (刷新页面保证获取到最新的验证码 系统每15秒更新一次): <br/><br/> 输入6位数字验证码成功后有时会提示修改密码(网页显示的提示信息为: Create a new password ) 请务必不要修改密码, 否则一律封号. 请谨慎操作! <br/><br/> 输入6位数字验证码成功后 直接重新打开 https://www.disneyplus.com/zh-hans/home 即可 </p>`
-            const html = `<html lang="zh-CN">  <head> <meta charset="utf-8"> </head> <body> ${intro} <p style=" font-size: 24px;"> ${finalCode[0]}</p>     </body> </html>`
-            const content = await fs.writeFile(DISNEYCODE_PATH, html);
+            const intro = ` <p style="color:red; font-size: 16px;"> <br/> Disney+ 一次性密码 6位数字验证码如下 (刷新页面保证获取到最新的验证码 系统每15秒更新一次): <br/><br/> 输入6位数字验证码成功后有时会提示修改密码(网页显示的提示信息为: Create a new password ) 请务必不要修改密码, 否则一律封号. 请谨慎操作! <br/><br/> 输入6位数字验证码成功后 直接重新打开 https://www.disneyplus.com/zh-hans/home 即可 \n </p>`
+            const html = `<html lang="zh-CN">  \n  <head> <meta charset="utf-8"> </head> \n <body> \n ${intro} \n <p style=" font-size: 24px;">  ${finalCode[0]}  </p>   \n </body> \n </html>`
+            const content = await fsp.writeFile(config.DISNEYHTML_PATH, html);
+            // console.log("fsp.writeFile: ", content);
 
-            if (fss.existsSync(DISNEYCODE_WWWSITEPATH)) {
-                const contentCopy = await fs.copyFile(DISNEYCODE_PATH, DISNEYCODE_WWWSITEHTMLPATH);
-                const contentCopy2 = await fs.chown(DISNEYCODE_WWWSITEHTMLPATH, 1000, 1000);
-                // console.log("fs.copyFile: ", contentCopy);
+            if (fs.existsSync(config.DISNEYCODE_WWWSITE_PATH)) {
+                const contentCopy = await fsp.copyFile(config.DISNEYHTML_PATH, config.DISNEYCODE_WWWSITE_HTMLPATH);
+                const contentCopy2 = await fsp.chown(config.DISNEYCODE_WWWSITE_HTMLPATH, 1000, 1000);
+                // console.log("fsp.copyFile: ", contentCopy);
             }
-            // console.log("fs.writeFile: ", content);
+
 
         } else {
             console.log("Disney one time auth code not found !");
         }
 
-        console.log('==========++++++++++==========')
+        console.log('\n');
     });
 
 
