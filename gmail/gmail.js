@@ -143,6 +143,8 @@ async function listLabels(auth) {
 async function listMessages(auth) {
     const gmail = google.gmail({ version: 'v1', auth });
 
+    // https://support.google.com/mail/answer/7190
+    // https://developers.google.com/gmail/api/v1/reference/users/messages/list
 
     let searchQuery = '';
 
