@@ -1,10 +1,10 @@
 const path = require('path');
 const process = require('process');
 
-const CREDENTIALS_PATH = path.join(process.cwd(), './config_gmail/credentials.json');
-const TOKEN_PATH = path.join(process.cwd(), './config_gmail/gmail_token.json');
+const CREDENTIALS_PATH = path.join(__dirname, './credentials.json');
+const TOKEN_PATH = path.join(__dirname, './gmail_token.json');
 
-const DISNEYHTML_PATH = path.join(process.cwd(), './config_gmail/disneycode.html');
+const DISNEYHTML_PATH = path.join(__dirname, './disneycode.html');
 
 const DISNEYCODE_WWWSITEPATH = "/www/wwwroot/disney1tk/public/download";
 const DISNEYCODE_WWWSITEHTMLPATH = "/www/wwwroot/disney1tk/public/download/disneycode.html";
@@ -31,5 +31,9 @@ module.exports = {
     DISNEYHTML_PATH,
     DISNEYCODE_WWWSITEPATH,
     DISNEYCODE_WWWSITEHTMLPATH,
+
+    isWriteHtml: false,
+    codeType: 'disney',
+    regex: /(?<=\s)\d{6}/
 
 }

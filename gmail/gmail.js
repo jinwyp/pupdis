@@ -156,6 +156,9 @@ async function listMessages(auth) {
         searchQuery = searchQuery + `subject:${config.searchGmail.subject}`;
     }
 
+    console.log("searchQuery: ", searchQuery);
+    console.log('\n');
+
     const res = await gmail.users.messages.list({
         // Include messages from `SPAM` and `TRASH` in the results.
         includeSpamTrash: true,
@@ -183,68 +186,109 @@ async function listMessages(auth) {
         console.log('\n');
         console.log('No Gmail messages found.');
         return;
-    }
+    } else {
 
-    const matchRegExpCode = /(?<=\s)\d{6}/;
-
-    messages.forEach(async(message) => {
-
-        console.log(`=== Gmail message id :  ${message.id} | ${message.threadId}`);
-        const messageInfo = await gmail.users.messages.get({
-            // The format to return the message in.
-            format: 'full',
-
-            // The ID of the message to retrieve. This ID is usually retrieved using `messages.list`. The ID is also contained in the result when a message is inserted (`messages.insert`) or imported (`messages.import`).
-            id: message.id,
-
-            // When given and format is `METADATA`, only include headers specified.
-            metadataHeaders: '',
-
-            // The user's email address. The special value `me` can be used to indicate the authenticated user.
-            userId: 'me',
-
-        });
-
-        // console.log(messageInfo.data.payload.body);
-        let bodyData = messageInfo.data.payload.body.data;
-
-        if (messageInfo.data.payload.body.size === 0) {
-            bodyData = messageInfo.data.payload.parts[0].body.data;
-        }
+        let result = '';
+        let matchRegExpCode = config.regex;
 
 
-        const bodyInfo = Buffer.from(bodyData, 'base64').toString('utf-8');
-        let finalCode = matchRegExpCode.exec(bodyInfo);
+        for await (let message of messages) {
 
-        // console.log(bodyInfo);
+            console.log(`=== Gmail message id :  ${message.id} | ${message.threadId}`);
+            const messageInfo = await gmail.users.messages.get({
+                // The format to return the message in.
+                format: 'full',
 
-        if (finalCode) {
-            console.log("")
-            console.log('Disney one time auth code: ');
-            console.log("")
-            console.log(finalCode[0]);
-            console.log("")
-            const intro = ` <p style="color:red; font-size: 16px;"> <br/> Disney+ 一次性密码 6位数字验证码如下 (刷新页面保证获取到最新的验证码 系统每15秒更新一次): <br/><br/> 输入6位数字验证码成功后有时会提示修改密码(网页显示的提示信息为: Create a new password ) 请务必不要修改密码, 否则一律封号. 请谨慎操作! <br/><br/> 输入6位数字验证码成功后 直接重新打开 https://www.disneyplus.com/zh-hans/home 即可 \n </p>`
-            const html = `<html lang="zh-CN">  \n  <head> <meta charset="utf-8"> </head> \n <body> \n ${intro} \n <p style=" font-size: 24px;">  ${finalCode[0]}  </p>   \n </body> \n </html>`
-            const content = await fsp.writeFile(config.DISNEYHTML_PATH, html);
-            // console.log("fsp.writeFile: ", content);
+                // The ID of the message to retrieve. This ID is usually retrieved using `messages.list`. The ID is also contained in the result when a message is inserted (`messages.insert`) or imported (`messages.import`).
+                id: message.id,
 
-            if (fs.existsSync(config.DISNEYCODE_WWWSITE_PATH)) {
-                const contentCopy = await fsp.copyFile(config.DISNEYHTML_PATH, config.DISNEYCODE_WWWSITE_HTMLPATH);
-                const contentCopy2 = await fsp.chown(config.DISNEYCODE_WWWSITE_HTMLPATH, 1000, 1000);
-                // console.log("fsp.copyFile: ", contentCopy);
+                // When given and format is `METADATA`, only include headers specified.
+                metadataHeaders: '',
+
+                // The user's email address. The special value `me` can be used to indicate the authenticated user.
+                userId: 'me',
+
+            });
+
+            // console.log(messageInfo.data.payload.body);
+            let bodyData = messageInfo.data.payload.body.data;
+
+            if (messageInfo.data.payload.body.size === 0) {
+                bodyData = messageInfo.data.payload.parts[0].body.data;
             }
 
 
-        } else {
-            console.log("Disney one time auth code not found !");
-        }
+            const bodyInfo = Buffer.from(bodyData, 'base64').toString('utf-8');
+            let finalCode = matchRegExpCode.exec(bodyInfo);
 
-        console.log('\n');
-    });
+            // console.log(bodyInfo);
 
+            if (finalCode) {
+                console.log("")
+                console.log('Code: ');
+                console.log("")
+                console.log(finalCode[0]);
+                console.log("")
 
+                result = finalCode[0];
+
+                if (config.isWriteHtml) {
+                    const intro = ` <p style="color:red; font-size: 16px;"> <br/> Disney+ 一次性密码 6位数字验证码如下 (刷新页面保证获取到最新的验证码 系统每15秒更新一次): <br/><br/> 输入6位数字验证码成功后有时会提示修改密码(网页显示的提示信息为: Create a new password ) 请务必不要修改密码, 否则一律封号. 请谨慎操作! <br/><br/> 输入6位数字验证码成功后 直接重新打开 https://www.disneyplus.com/zh-hans/home 即可 \n </p>`
+                    const html = `<html lang="zh-CN">  \n  <head> <meta charset="utf-8"> </head> \n <body> \n ${intro} \n <p style=" font-size: 24px;">  ${finalCode[0]}  </p>   \n </body> \n </html>`
+                    const content = await fsp.writeFile(config.DISNEYHTML_PATH, html);
+                    // console.log("fsp.writeFile: ", content);
+
+                    if (fs.existsSync(config.DISNEYCODE_WWWSITE_PATH)) {
+                        const contentCopy = await fsp.copyFile(config.DISNEYHTML_PATH, config.DISNEYCODE_WWWSITE_HTMLPATH);
+                        const contentCopy2 = await fsp.chown(config.DISNEYCODE_WWWSITE_HTMLPATH, 1000, 1000);
+                        // console.log("fsp.copyFile: ", contentCopy);
+                    }
+
+                }
+
+            } else {
+                console.log("Disney one time auth code not found !");
+            }
+        };
+
+        return result;
+
+    }
 }
 
 
-authorize().then(listMessages).catch(console.error);
+
+async function getDisneyCode() {
+    config.isWriteHtml = true;
+    config.codeType = 'disney';
+    config.regex = /(?<=\s)\d{6}/
+    authorize().then(listMessages).catch(console.error);
+}
+
+
+async function getAppleEmailCode() {
+    config.isWriteHtml = false;
+
+    config.searchGmail.subject = 'Verify your Apple ID email address';
+    config.codeType = 'appleemail'
+    config.regex = /\d{6}/;
+
+    let result = await authorize().then(listMessages).catch(console.error);
+
+    return result;
+}
+async function getAppleSMSCode() {
+    config.isWriteHtml = false;
+
+    config.searchGmail.subject = 'New text message from';
+    config.codeType = 'applesms'
+    config.regex = /(?<=\s)\d{6}/;
+
+    let result = await authorize().then(listMessages).catch(console.error);
+
+    return result;
+}
+
+exports.getDisneyCode = getDisneyCode;
+exports.getAppleEmailCode = getAppleEmailCode;
+exports.getAppleSMSCode = getAppleSMSCode;
