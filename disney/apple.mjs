@@ -5,6 +5,8 @@ import { stdin as input, stdout as output } from 'node:process';
 
 import { getAppleEmailCode, getAppleSMSCode } from '../gmail/gmail.js';
 
+import { siteApple1, siteApple2, siteDisney1, siteDisney2 } from './siteConfig.mjs';
+
 // console.log('==============================')
 // console.log('executablePath Path: ', executablePath())
 // console.log('==============================')
@@ -13,119 +15,6 @@ import { getAppleEmailCode, getAppleSMSCode } from '../gmail/gmail.js';
 const rl = readline.createInterface({ input, output });
 
 
-
-const siteApple1 = {
-    url: 'https://appleid.apple.com/account',
-    action: [{
-            type: 'type',
-            selector: 'last-name-input input',
-            value: 'Wang',
-        },
-        {
-            type: 'type',
-            selector: 'first-name-input input',
-            value: 'Anna',
-        },
-        {
-            type: 'select',
-            selector: '.form-dropdown.country-picker.idms-address-country',
-            value: 'TUR',
-        },
-
-        {
-            type: 'type',
-            selector: 'wc-birthday input',
-            value: '01/30/1981',
-        },
-        {
-            type: 'type',
-            selector: 'email-input input',
-            value: 'ninatk13@disney1.us',
-        },
-        {
-            type: 'type',
-            selector: 'new-password input',
-            value: 'nina13APPLE2022@',
-        },
-        {
-            type: 'type',
-            selector: 'confirm-password-input input',
-            value: 'nina13APPLE2022@',
-        },
-
-        {
-            type: 'select',
-            selector: 'phone-input select',
-            value: 'US',
-        },
-        {
-            type: 'type',
-            selector: 'phone-input input',
-            value: '2095026290',
-        },
-        {
-            type: 'click',
-            selector: '.verify-mode-sms-input',
-            value: '',
-        },
-        {
-            type: 'click',
-            selector: '#news',
-            value: '',
-        },
-        {
-            type: 'click',
-            selector: '#itunes',
-            value: '',
-        },
-        {
-            type: 'type',
-            selector: 'captcha-input input',
-            value: '',
-        },
-
-        {
-            type: 'click',
-            selector: '.last.nav-action',
-            value: '',
-        },
-
-
-        {
-            type: 'waitForSelector',
-            selector: '#char0',
-            value: '',
-        },
-        {
-            type: 'type',
-            selector: '#char0',
-            value: '',
-            gmail: 'appleidemail'
-        },
-        {
-            type: 'click',
-            selector: '.idms-modal-dialog button.last.pull-right',
-            value: '',
-        },
-
-        {
-            type: 'waitForSelector',
-            selector: '.step-verify-code .not-mobile',
-            value: '',
-        },
-        {
-            type: 'type',
-            selector: '#char0',
-            value: '',
-            gmail: 'appleidsms'
-        },
-        {
-            type: 'click',
-            selector: '.idms-modal-dialog button.last.pull-right',
-            value: '',
-        },
-    ]
-}
 
 
 
@@ -137,7 +26,7 @@ async function appleid(site) {
         defaultViewport: null,
         args: [
             "--no-sandbox",
-            "--window-size=1400,800",
+            "--window-size=1300,900",
             "--lang=en-US",
         ],
         env: {
@@ -147,7 +36,8 @@ async function appleid(site) {
         executablePath: executablePath(),
     });
 
-    const page = await browser.newPage();
+    let page = await browser.newPage();
+    let pageOld = page;
 
     // https://stackoverflow.com/questions/46908636/how-to-specify-browser-language-in-puppeteer
     await page.setExtraHTTPHeaders({
@@ -169,23 +59,48 @@ async function appleid(site) {
     });
 
     await page.setViewport({
-        width: 1400,
-        height: 800,
+        width: 1300,
+        height: 900,
         deviceScaleFactor: 1,
     });
 
     await page.goto(site.url, {
         waitUntil: 'networkidle0',
+        timeout: 120000
     });
 
 
-    for await (let action of site.action) {
+    for await (let action of site.actions) {
+        let elementHandle;
+        let frame
+
+        if (action.iframe) {
+            await page.waitForSelector(action.iframe);
+            elementHandle = await page.$(action.iframe);
+            frame = await elementHandle.contentFrame();
+            page = frame;
+        }
 
         switch (action.type) {
             case 'type':
-
+                if (action.deleteText) {
+                    const input = await page.$(action.selector);
+                    await input.click({ clickCount: 3 })
+                    await page.keyboard.press('Backspace');
+                }
                 if (action.value) {
-                    await page.type(action.selector, action.value);
+                    let isNodeExist = (await page.$(action.selector)) || "";
+
+                    if (action.selectorIsExist) {
+
+                        if (isNodeExist) {
+                            await page.type(action.selector, action.value);
+                        }
+                    } else {
+                        await page.type(action.selector, action.value);
+                    }
+                    // console.log('test: ', test);
+
 
                 } else {
                     console.log()
@@ -212,18 +127,55 @@ async function appleid(site) {
 
                 break;
 
+            case 'click':
+                let isNodeExist = (await page.$(action.selector)) || "";
+                if (isNodeExist) {
+                    await page.click(action.selector);
+                    await page.waitForTimeout(2000);
+                } else {
+                    console.log('Node not found: ', action.selector);
+                }
+
+                break;
+
             case 'select':
                 await page.select(action.selector, action.value);
                 break;
 
-            case 'click':
-                await page.click(action.selector);
+            case 'checkbox':
+                let tempNode = await page.$(action.selector);
+                // let isChecked = await page.evaluate(node => node.checked, tempNode);
+                let isChecked = await tempNode.getProperty('checked');
+                let isChecked2 = await isChecked.jsonValue();
+
+                if (isChecked2 !== action.value) {
+                    await page.click(action.selectorLabel);
+                }
+
+                // await page.$eval(action.selector, (check, actioneval) => check.checked = actioneval.value, action);
+                // await page.$$eval("input[type='checkbox']", checks => checks.forEach(c => c.checked = action.value));
                 break;
+
+
 
             case 'waitForSelector':
                 await page.waitForSelector(action.selector)
                 break;
 
+            case 'waitForNetworkIdle':
+                await page.waitForNetworkIdle()
+                break;
+
+            case 'waitForTimeout':
+                await page.waitForTimeout(action.value)
+                break;
+
+            case 'goto':
+                await pageOld.goto(action.value, {
+                    waitUntil: 'networkidle0',
+                });
+                page = pageOld
+                break;
             default:
                 console.log('No action type found');
 
@@ -254,8 +206,12 @@ async function appleid(site) {
     // // Print all the files.
     // console.log(links.join('\n'));
 
-    await browser.close();
+    // await browser.close();
 };
 
 
-appleid(siteApple1)
+// appleid(siteApple1)
+// appleid(siteApple2)
+
+// appleid(siteDisney1)
+appleid(siteDisney2)

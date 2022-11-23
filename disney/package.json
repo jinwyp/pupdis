@@ -19,8 +19,8 @@
     },
     "homepage": "https://github.com/jinwyp/pupdis#readme",
     "dependencies": {
-        "puppeteer": "^19.2.2",
         "@google-cloud/local-auth": "^2.1.0",
-        "googleapis": "^105.0.0"
+        "googleapis": "^105.0.0",
+        "puppeteer": "^19.3.0"
     }
 }
