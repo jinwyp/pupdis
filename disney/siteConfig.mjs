@@ -486,6 +486,17 @@ for (let i = 2; i < 8; i++) {
     const tempNewUser = [
 
         {
+            type: 'goto',
+            selector: '',
+            value: 'https://www.disneyplus.com/edit-profiles'
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 6000
+        },
+
+        {
             type: 'click',
             selector: '.dFOTSU.add-profile',
             value: '',
@@ -503,7 +514,7 @@ for (let i = 2; i < 8; i++) {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 2000
+            value: 4000
         },
         {
             type: 'type',
