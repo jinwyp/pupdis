@@ -17,7 +17,7 @@
 
 
 
-### Disney+ Reservation
+### Disney+ Registration
 
 1. Run the following command to install the required dependencies:
 
