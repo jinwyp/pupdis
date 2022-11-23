@@ -236,12 +236,12 @@ async function listMessages(auth) {
                     const intro = ` <p style="color:red; font-size: 16px;"> <br/> Disney+ 一次性密码 6位数字验证码如下 (刷新页面保证获取到最新的验证码 系统每15秒更新一次): <br/><br/> 输入6位数字验证码成功后有时会提示修改密码(网页显示的提示信息为: Create a new password ) 请务必不要修改密码, 否则一律封号. 请谨慎操作! <br/><br/> 输入6位数字验证码成功后 直接重新打开 https://www.disneyplus.com/zh-hans/home 即可 \n </p>`
                     const html = `<html lang="zh-CN">  \n  <head> <meta charset="utf-8"> </head> \n <body> \n ${intro} \n <p style=" font-size: 24px;">  ${finalCode[0]}  </p>   \n </body> \n </html>`
                     const content = await fsp.writeFile(config.DISNEYHTML_PATH, html);
-                    // console.log("fsp.writeFile: ", content);
+                    console.log("fsp.writeFile: ", content);
 
-                    if (fs.existsSync(config.DISNEYCODE_WWWSITE_PATH)) {
-                        const contentCopy = await fsp.copyFile(config.DISNEYHTML_PATH, config.DISNEYCODE_WWWSITE_HTMLPATH);
-                        const contentCopy2 = await fsp.chown(config.DISNEYCODE_WWWSITE_HTMLPATH, 1000, 1000);
-                        // console.log("fsp.copyFile: ", contentCopy);
+                    if (fs.existsSync(config.DISNEYCODE_WWWSITEPATH)) {
+                        const contentCopy = await fsp.copyFile(config.DISNEYHTML_PATH, config.DISNEYCODE_WWWSITEHTMLPATH);
+                        const contentCopy2 = await fsp.chown(config.DISNEYCODE_WWWSITEHTMLPATH, 1000, 1000);
+                        console.log("fsp.copyFile: ", contentCopy);
                     }
 
                 }
