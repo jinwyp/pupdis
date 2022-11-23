@@ -206,7 +206,7 @@ async function appleid(site) {
     // // Print all the files.
     // console.log(links.join('\n'));
 
-    // await browser.close();
+    await browser.close();
 };
 
 
