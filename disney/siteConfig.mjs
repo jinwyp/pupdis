@@ -1,7 +1,12 @@
 const user = {
-    appleId: 'ninatk13@disney1.us',
-    applePW: 'nina13APPLE2022@',
-    disneyPW: 'ninatk13DIS',
+    appleId: 'ninatk14@disney1.us',
+    applePW: 'nina14APPLE_2022',
+    applePhone: '2095026290',
+    disneyPW: 'ninatk14DIS',
+}
+
+const captchaConfig = {
+    clientKey: "a22fe5302f875ac756087738e91da1990473c6aa12133"
 }
 
 
@@ -58,7 +63,7 @@ const siteApple1 = {
         {
             type: 'type',
             selector: 'phone-input input',
-            value: '2095026290',
+            value: user.applePhone,
         },
         {
             type: 'click',
@@ -77,8 +82,10 @@ const siteApple1 = {
         },
         {
             type: 'type',
+            selectorCaptcha: '.idms-captcha-wrapper img',
             selector: 'captcha-input input',
             value: '',
+            gmail: 'captcha'
         },
 
         {
@@ -119,6 +126,80 @@ const siteApple1 = {
         {
             type: 'click',
             selector: '.idms-modal-dialog button.last.pull-right',
+            value: '',
+        },
+
+
+
+
+
+
+
+
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 10000
+        },
+
+        {
+            type: 'goto',
+            selector: '',
+            value: 'https://appleid.apple.com/account/manage?mode=standalone&section=payment'
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 6000
+        },
+        {
+            type: 'waitForSelector',
+            selector: '.form-address',
+            value: '',
+        },
+        {
+            type: 'type',
+            selector: '.form-address .idms-address-line1',
+            value: 'Bardakçi',
+        },
+        {
+            type: 'type',
+            selector: '.form-address .idms-address-line2',
+            value: 'Bardakçi,25',
+        },
+        {
+            type: 'type',
+            selector: '.form-address .idms-address-postal-code input',
+            value: '25750',
+        },
+        {
+            type: 'type',
+            selector: '.form-address .idms-address-city input',
+            value: 'Çat',
+        },
+        {
+            type: 'type',
+            selector: '.form-address .payment-phonenumber-areaCode',
+            value: '123',
+        },
+        {
+            type: 'type',
+            selector: '.form-address .payment-phonenumber-number',
+            value: '1234567',
+        },
+        {
+            type: 'click',
+            selector: '#cbCopyBillingAddress',
+            value: '',
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
+        },
+        {
+            type: 'click',
+            selector: '.weight-medium.save-payment',
             value: '',
         },
     ]
@@ -181,7 +262,7 @@ const siteApple2 = {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 12000
+            value: 10000
         },
 
         {
@@ -189,7 +270,11 @@ const siteApple2 = {
             selector: '',
             value: 'https://appleid.apple.com/account/manage?mode=standalone&section=payment'
         },
-
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 6000
+        },
         {
             type: 'waitForSelector',
             selector: '.form-address',
@@ -326,7 +411,7 @@ const siteDisney2 = {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 2000
+            value: 1000
         },
         {
             type: 'waitForSelector',
@@ -346,27 +431,41 @@ const siteDisney2 = {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 10000
+            value: 8000
         },
+
+
         {
             type: 'click',
-            selector: '.button--primary.sc-bFADNz',
+            selector: '[data-gv2interactionkey="decisionIntroBtnEvt"]',
             value: ''
         },
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 3000
+            value: 1000
         },
+
         {
             type: 'click',
-            selector: '.button--primary',
+            selector: '[data-gv2elementkey="not_now"]',
             value: ''
         },
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 3000
+            value: 1000
+        },
+
+        {
+            type: 'click',
+            selector: '[data-testid="welch-onboarding-banner-button-hasUpdatedRating-false"]',
+            value: ''
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 2000
         },
 
 
@@ -384,13 +483,31 @@ const siteDisney2 = {
 
         {
             type: 'click',
+            selector: '[data-testid="modal-primary-button"]',
+            value: ''
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 2000
+        },
+
+        {
+            type: 'type',
+            selectorIsExist: '#dssLogin',
+            selector: '#password',
+            value: user.disneyPW,
+        },
+
+        {
+            type: 'click',
             selector: '[data-testid="profile-avatar-0"] div',
             value: '',
         },
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 3000
+            value: 2000
         },
         {
             type: 'waitForSelector',
@@ -414,9 +531,30 @@ const siteDisney2 = {
             value: '',
         },
         {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
+        },
+        {
             type: 'click',
             selector: '[for="groupWatch"]',
             value: '',
+        },
+        {
+            type: 'type',
+            selectorIsExist: '#dssLogin',
+            selector: '#password',
+            value: user.disneyPW,
+        },
+        {
+            type: 'click',
+            selector: '[data-testid="password-continue-login"]',
+            value: '',
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
         },
         {
             type: 'click',
@@ -431,7 +569,7 @@ const siteDisney2 = {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 4000
+            value: 2000
         },
         {
             type: 'click',
@@ -465,16 +603,30 @@ const siteDisney2 = {
             value: '',
         },
         {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
+        },
+        {
             type: 'click',
             selector: '.button--primary',
             value: '',
         },
         {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
+        },
+        {
             type: 'click',
-            selector: '.sc-brqgnP.button--secondary',
+            selector: '[data-gv2elementkey="save"]',
             value: '',
         },
-
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 4000
+        },
     ]
 }
 
@@ -498,13 +650,13 @@ for (let i = 2; i < 8; i++) {
 
         {
             type: 'click',
-            selector: '.dFOTSU.add-profile',
+            selector: '[data-testid="add-profile-cta"]',
             value: '',
         },
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 3000
+            value: 4000
         },
         {
             type: 'click',
@@ -514,11 +666,11 @@ for (let i = 2; i < 8; i++) {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 4000
+            value: 2000
         },
         {
             type: 'type',
-            selector: '#addProfile',
+            selector: '[data-testid="profile-name-input"]',
             value: 'P' + i.toString(),
         },
         {
@@ -532,9 +684,19 @@ for (let i = 2; i < 8; i++) {
             value: '',
         },
         {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
+        },
+        {
             type: 'click',
             selector: '[data-testid="maturity-rating-button"]',
             value: '',
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
         },
         {
             type: 'type',
@@ -546,6 +708,11 @@ for (let i = 2; i < 8; i++) {
             type: 'click',
             selector: '[data-testid="password-continue-login"]',
             value: '',
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
         },
         {
             type: 'click',
@@ -601,6 +768,11 @@ for (let i = 2; i < 8; i++) {
             value: '',
         },
         {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 1000
+        },
+        {
             type: 'click',
             selector: '[data-gv2elementkey="current_language"]',
             value: '',
@@ -613,14 +785,18 @@ for (let i = 2; i < 8; i++) {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 4000
+            value: 2000
         },
         {
             type: 'click',
-            selector: '.sc-brqgnP.button--secondary',
+            selector: '[data-gv2elementkey="save"]',
             value: '',
         },
-
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 2000
+        },
     ]
 
     tempUserList = [...tempUserList, ...tempNewUser]
@@ -628,4 +804,4 @@ for (let i = 2; i < 8; i++) {
 }
 
 siteDisney2.actions = [...siteDisney2.actions, ...tempUserList]
-export { siteApple1, siteApple2, siteDisney1, siteDisney2 };
+export { captchaConfig, siteApple1, siteApple2, siteDisney1, siteDisney2 };
