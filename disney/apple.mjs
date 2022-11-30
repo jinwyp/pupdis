@@ -4,7 +4,7 @@ import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 
 
-import { getAppleEmailCode, getAppleSMSCode } from '../gmail/gmail.js';
+import { getAppleEmailCode, getAppleSMSCode, getDisneyCode } from '../gmail/gmail.js';
 
 import { captchaConfig, siteApple1, siteApple2, siteDisney1, siteDisney2 } from './siteConfig.mjs';
 
@@ -127,6 +127,13 @@ async function newAppleID(site) {
                         await page.waitForTimeout(10000);
                         const gmailcode = await getAppleSMSCode();
                         console.log("Apple ID SMS Code : ", gmailcode);
+                        await page.type(action.selector, gmailcode);
+                        await page.waitForTimeout(1000);
+
+                    } else if (action.gmail === 'disneycode') {
+                        await page.waitForTimeout(10000);
+                        const gmailcode = await getDisneyCode();
+                        console.log("Disney Code : ", gmailcode);
                         await page.type(action.selector, gmailcode);
                         await page.waitForTimeout(1000);
 

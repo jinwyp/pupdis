@@ -443,7 +443,7 @@ const siteDisney2 = {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 1000
+            value: 2000
         },
 
         {
@@ -454,7 +454,7 @@ const siteDisney2 = {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 1000
+            value: 2000
         },
 
         {
@@ -465,8 +465,62 @@ const siteDisney2 = {
         {
             type: 'waitForTimeout',
             selector: '',
-            value: 2000
+            value: 4000
         },
+
+
+
+        // {
+        //     type: 'goto',
+        //     selector: '',
+        //     value: 'https://www.disneyplus.com/account'
+        // },
+        // {
+        //     type: 'waitForTimeout',
+        //     selector: '',
+        //     value: 6000
+        // },
+        // {
+        //     type: 'click',
+        //     selector: '[data-testid="modal-primary-button"]',
+        //     value: ''
+        // },
+        // {
+        //     type: 'waitForTimeout',
+        //     selector: '',
+        //     value: 2000
+        // },
+        // {
+        //     type: 'click',
+        //     selector: '[data-gv2elementkey="emailEdit"]',
+        //     value: ''
+        // },
+        // {
+        //     type: 'waitForTimeout',
+        //     selector: '',
+        //     value: 6000
+        // },
+        // {
+        //     type: 'type',
+        //     selector: '[data-testid="digit-0"]',
+        //     value: '',
+        //     gmail: 'disneycode'
+        // },
+        // {
+        //     type: 'waitForTimeout',
+        //     selector: '',
+        //     value: 2000
+        // },
+        // {
+        //     type: 'click',
+        //     selector: '[data-gv2elementkey="continue"]',
+        //     value: '',
+        // },
+        // {
+        //     type: 'waitForTimeout',
+        //     selector: '',
+        //     value: 4000
+        // },
 
 
 
@@ -556,21 +610,7 @@ const siteDisney2 = {
             selector: '',
             value: 1000
         },
-        {
-            type: 'click',
-            selector: '[data-gv2elementkey="current_language"]',
-            value: '',
-        },
-        {
-            type: 'click',
-            selector: '#react-select-2-option-23',
-            value: '',
-        },
-        {
-            type: 'waitForTimeout',
-            selector: '',
-            value: 2000
-        },
+
         {
             type: 'click',
             selector: '[data-gv2elementkey="parental_controls"]',
@@ -616,6 +656,21 @@ const siteDisney2 = {
             type: 'waitForTimeout',
             selector: '',
             value: 1000
+        },
+        {
+            type: 'click',
+            selector: '[data-gv2elementkey="current_language"]',
+            value: '',
+        },
+        {
+            type: 'click',
+            selector: '#react-select-2-option-23',
+            value: '',
+        },
+        {
+            type: 'waitForTimeout',
+            selector: '',
+            value: 10000
         },
         {
             type: 'click',

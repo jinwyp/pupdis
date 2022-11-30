@@ -263,7 +263,9 @@ async function getDisneyCode() {
     config.searchGmail.subject = '您的一次性密码 OR subject:Your one-time passcode';
     config.codeType = 'disney';
     config.regex = /(?<=\s)\d{6}/
-    authorize().then(listMessages).catch(console.error);
+
+    let result = await authorize().then(listMessages).catch(console.error);
+    return result;
 }
 
 
