@@ -2,7 +2,7 @@
 
 ### Get SMS code or Email message through Gmail API
 
-1. Go to [Google Gmail API Node.js quickstart](https://developers.google.com/gmail/api/quickstart/nodejs) 
+1. Go to [Google Gmail API Node.js quickstart](https://developers.google.com/gmail/api/quickstart/nodejs). Follow the instructions to enable the Gmail API and download the credentials.json file.
 
 2. Run the following command to install the required dependencies:
 

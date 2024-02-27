@@ -24,3 +24,9 @@ done
 * * * * * sleep 30; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
 * * * * * sleep 40; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
 * * * * * sleep 50; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1
+
+# add to crontab
+
+(crontab -l ; echo "* * * * * cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1") | sort - | uniq - | crontab -
+(crontab -l ; echo "* * * * * sleep 20; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1") | sort - | uniq - | crontab -
+(crontab -l ; echo "* * * * * sleep 40; cd /root/disneyp/pupdis && /root/.nvm/versions/node/v18.12.0/bin/node /root/disneyp/pupdis/gmail.js >/dev/null 2>&1") | sort - | uniq - | crontab -
